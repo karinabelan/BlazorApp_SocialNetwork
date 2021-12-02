@@ -1,0 +1,73 @@
+﻿@page "/"
+@using BlazorApp_SocialNetwork.Account
+@using BlazorApp_SocialNetwork.Data;
+@inject BlazorApp_SocialNetwork.Account.Password currentPassword
+@inject BlazorApp_SocialNetwork.Data.User currentUser
+@inject BlazorApp_SocialNetwork.IService.IServiceObj<User> userService
+@if (FindUser(userEmail))
+{
+    <h1>Wellcome back, @userForTitle.firstname @userForTitle.lastname,</h1>
+}
+else
+{
+    <h1>Welcome!</h1>
+}
+<div class="centre">
+    <p> <label>Login to <b>have a permission of ADMIN/user</b>(after press "ENTER"):</label></p>
+
+    <p><input @bind="userEmail" style="width:40%;" placeholder="email" /></p>
+
+    <p><input @bind="currentPassword.PasswordInputed" style="width:40%;" placeholder="password" /></p>
+    <button class="btn btn-primary" @onclick="@(e=>FindUser(userEmail))">Log in</button>
+    <label>@message</label>
+</div>
+<p>
+    <div class="centre">
+        <h4> Social network"MarisaBook" </h4>
+<p><img src="https://cdn4.iconfinder.com/data/icons/iconsimple-logotypes/512/github-256.png" alt="Фото"></p>
+
+</div>
+</p>
+
+
+@code{
+    User user = new User();
+    User userForTitle;
+    List<User> usersArr = new List<User>();
+    string userEmail = "";
+    string message = "";
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUsers();
+    }
+    private void GetUsers()
+    {
+        usersArr = userService.GetUsers();
+    }
+    private bool FindUser(string userE)
+    {
+        bool result = false;
+        string passTemp = currentPassword.PasswordInputed;
+        message = "Sorry u wasnot register yet or not correct passwor/login!";
+
+        foreach (var userTemp in usersArr)
+        {
+            if (userTemp.Email == userEmail & userTemp.Password == passTemp)
+            {
+                userForTitle = userTemp;
+                message = "Thanks!";
+                result = true;
+                GetIdUser(userTemp);
+            }
+
+        }
+        return result;
+    }
+    private void GetIdUser(User user)
+    {
+        currentUser = user;
+    }
+}

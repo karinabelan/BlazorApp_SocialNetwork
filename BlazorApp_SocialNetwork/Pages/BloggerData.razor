@@ -1,0 +1,124 @@
+﻿@page "/blogers"
+
+
+@using BlazorApp_SocialNetwork.Data
+@inject BlazorApp_SocialNetwork.IService.IServiceObj<Blogger> actorService
+@inject Account.Password currentPassword
+
+<body>
+    <h3>Our bloggers</h3>
+    <table class="table">
+        <thead>
+            <tr>
+
+                <th>Id </th>
+
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Hometown</th>
+                <th>Follower</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var person in usersArr)
+            {
+
+                <tr>
+                    <td>@person.Id</td>
+                    <td>@person.FirstName</td>
+                    <td>@person.LastName</td>
+                    <td>@person.HomeTown</td>
+                    <td>@person.Follower</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(e=>Edit(@person.Id))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(e=>Delete(@person.Id))" style="float:right">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+
+
+    <div class="row">
+        <div class="col-nd-4">
+
+            <label>Firstname:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="person.FirstName" style="width:40%;" placeholder="Firstname" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-nd-4">
+            <label>Lastname:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="person.LastName" style="width:40%;" placeholder="Lastname" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-nd-4">
+            <label>Where is she/he from?:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="person.HomeTown" style="width:40%;" placeholder="HomeTown" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-nd-4">
+            <label>Num of followers?:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="person.Follower" type="number" style="width:40%;" placeholder="Followers" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-nd-4"></div>
+        <div class="col-nd-8">
+            <button class="btn btn-primary" @onclick="@(e=>Save())">Save</button>
+            <button class="btn btn-danger" @onclick="@(e=>Reset())" style="float:right">Reset</button>
+        </div>
+    </div>
+
+</body>
+
+
+@code {
+
+
+    Blogger person = new Blogger();
+    List<Blogger> usersArr = new List<Blogger>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUsers();
+    }
+
+    private void GetUsers()
+    {
+        usersArr = actorService.GetUsers();
+    }
+    private void Save()
+    {
+        actorService.SaveOrUpdate(person);
+        Reset();
+        GetUsers();
+    }
+    private void Reset()
+    {
+        person = new Blogger();
+    }
+    private void Edit(string userId)
+    {
+        person = actorService.GetUser(userId);
+    }
+    private void Delete(string userId)
+    {
+        actorService.Delete(userId);
+        GetUsers();
+    }
+}

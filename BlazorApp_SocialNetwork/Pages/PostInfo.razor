@@ -1,0 +1,126 @@
+﻿@page "/post"
+
+@using BlazorApp_SocialNetwork.Data
+@inject BlazorApp_SocialNetwork.IService.IServiceObj<Post> postService
+@inject BlazorApp_SocialNetwork.Data.User currentUser
+<head>
+
+    <title><h1><b>The bets Actors' in Cinema House Info:</b></h1></title>
+</head>
+<body>
+    @foreach (var post in postArr)
+    {
+        <div class="centre">
+            <label><b>@post.TitlePost</b></label>
+            <p><img src="@post.Image" alt="Фото" /></p>
+            <p>@post.TextForPost</p>
+            <p>
+
+                @if (counterClickLike % 2 == 0)
+                {
+                    <button id="close-CSS" @onclick="@(e => UnLikedPost(post))"></button>
+                    @post.Likes
+                }
+
+                else
+                {
+                    <button id="close-CSS" @onclick="@(e => LikedPost(post))"></button>
+                    @post.Likes
+                }
+
+
+
+                <button class="btn btn-danger" @onclick="@(e=>Delete(@post.Id))" style="float:right">Delete</button>
+            </p>
+        </div>
+
+    }
+    <div class="row">
+        <div class="col-nd-4">
+            <h3>Add post:</h3>
+            <label>Title:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="post.TitlePost" style="width:40%;" placeholder="Title" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-nd-4">
+            <label>Text about actor:</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="post.TextForPost" style="width:40%;" placeholder="Text there" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-nd-4">
+            <label>Image</label>
+        </div>
+        <div class="col-nd-8">
+            <input @bind="post.Image" style="width:40%;" placeholder="link on image" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-nd-4"></div>
+        <div class="col-nd-8">
+            <button class="btn btn-primary" @onclick="@(e=>Save())">Save</button>
+            <button class="btn btn-danger" @onclick="@(e=>Reset())" style="float:right">Reset</button>
+
+        </div>
+    </div>
+</body>
+
+@code {
+
+    string password;
+    Post post = new Post();
+    List<Post> postArr = new List<Post>();
+    int counterClickLike = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        GetUsers();
+    }
+
+    private void GetUsers()
+    {
+
+        postArr = postService.GetUsers();
+    }
+    private void Save()
+    {
+        postService.SaveOrUpdate(post);
+        Reset();
+        GetUsers();
+    }
+    private void Reset()
+    {
+        post = new Post();
+    }
+    private void Edit(string userId)
+    {
+        post = postService.GetUser(userId);
+    }
+    private void Delete(string userId)
+    {
+        postService.Delete(userId);
+        GetUsers();
+    }
+    private void LikedPost(Post post)
+    {
+        //postService.SaveInfoLike(post);
+        ++counterClickLike;
+        post.AddLike();
+        postService.SaveOrUpdate(post);
+        GetUsers();
+    }
+    private void UnLikedPost(Post post)
+    {
+        //postService.SaveInfoLike(post);
+        --counterClickLike;
+        post.AddUnLike();
+        postService.SaveOrUpdate(post);
+        GetUsers();
+    }
+
+}
