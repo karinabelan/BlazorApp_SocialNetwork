@@ -2,11 +2,9 @@
 
 @using BlazorApp_SocialNetwork.Data
 @inject BlazorApp_SocialNetwork.IService.IServiceObj<Post> postService
+@inject Neo4j.ServiceNeo4j userNeo4jService
 @inject BlazorApp_SocialNetwork.Data.User currentUser
-<head>
 
-    <title><h1><b>The bets Actors' in Cinema House Info:</b></h1></title>
-</head>
 <body>
     @foreach (var post in postArr)
     {
@@ -15,7 +13,14 @@
             <p><img src="@post.Image" alt="Фото" /></p>
             <p>@post.TextForPost</p>
             <p>
-
+                @if (MethodWithNeo4jUserPost(post))
+                {
+                    MethodWithNeo4jUnLike(post);
+                }
+                else
+                {
+                    MethodWithNeo4jLike(post);
+                }
                 @if (counterClickLike % 2 == 0)
                 {
                     <button id="close-CSS" @onclick="@(e => UnLikedPost(post))"></button>
@@ -46,7 +51,7 @@
     </div>
     <div class="row">
         <div class="col-nd-4">
-            <label>Text about actor:</label>
+            <label>Text:</label>
         </div>
         <div class="col-nd-8">
             <input @bind="post.TextForPost" style="width:40%;" placeholder="Text there" />
@@ -108,7 +113,6 @@
     }
     private void LikedPost(Post post)
     {
-        //postService.SaveInfoLike(post);
         ++counterClickLike;
         post.AddLike();
         postService.SaveOrUpdate(post);
@@ -116,11 +120,26 @@
     }
     private void UnLikedPost(Post post)
     {
-        //postService.SaveInfoLike(post);
         --counterClickLike;
         post.AddUnLike();
         postService.SaveOrUpdate(post);
         GetUsers();
     }
-
+    private bool MethodWithNeo4jUserPost(Post post)
+    {
+        bool result = false;
+        if (userNeo4jService.GetPathLength(currentUser.Id, post.Id) == 1)
+        {
+            result = true;
+        }
+        return result;
+    }
+    private void MethodWithNeo4jUnLike(Post post)
+    {
+        userNeo4jService.UnLikeUserPostGraph(currentUser.Id, post.Id);
+    }
+    private void MethodWithNeo4jLike(Post post)
+    {
+        userNeo4jService.LikeUserPostGraph(currentUser.Id, post.Id);
+    }
 }

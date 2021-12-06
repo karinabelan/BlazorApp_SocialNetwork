@@ -6,7 +6,7 @@
 @inject BlazorApp_SocialNetwork.IService.IServiceObj<User> userService
 @if (FindUser(userEmail))
 {
-    <h1>Wellcome back, @userForTitle.firstname @userForTitle.lastname,</h1>
+    <h1>Wellcome back @userForTitle.firstname @userForTitle.lastname</h1>
 }
 else
 {

@@ -1,6 +1,7 @@
 using BlazorApp_SocialNetwork.Account;
 using BlazorApp_SocialNetwork.Data;
 using BlazorApp_SocialNetwork.IService;
+using BlazorApp_SocialNetwork.Neo4j;
 using BlazorApp_SocialNetwork.Service;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -36,6 +37,7 @@ namespace BlazorApp_SocialNetwork
 
             services.AddScoped<IServiceObj<Post>, ServicePost>();
             services.AddScoped<Password>();
+            services.AddScoped<ServiceNeo4j>();
             services.AddScoped<User>();
 
         }
